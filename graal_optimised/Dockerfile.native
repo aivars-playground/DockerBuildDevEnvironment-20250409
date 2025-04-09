@@ -1,0 +1,15 @@
+FROM ghcr.io/graalvm/graalvm-community:24 AS builder
+RUN --mount=type=cache,target=/root/.m2,rw
+WORKDIR /opt/app
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline
+COPY ./src ./src
+RUN ./mvnw clean -Pnative native:compile
+
+#alpine uses libc, graal native needs glibc, error is non-informative: `exec ./app.native: no such file or directory`
+FROM alpine:latest
+RUN apk add gcompat
+COPY --from=builder /opt/app/target/graal_optimised /opt/app/app.native
+WORKDIR /opt/app
+ENTRYPOINT ["./app.native"]
