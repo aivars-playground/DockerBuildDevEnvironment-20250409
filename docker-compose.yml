@@ -5,9 +5,8 @@ services:
   demo_mongo_cache_service:
     image: mongo
     container_name: demo_mongo_cache_service
-    restart: always
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - mongo_cache_data_db:/data/db
       - mongo_cache_config_db:/data/configdb
@@ -20,8 +19,7 @@ services:
       dockerfile: ./Dockerfile
     container_name: demo_webapp_service
     ports:
-      - 8080:8080
-    restart: on-failure
+      - "8080:8080"
     environment:
       MONGO_CACHE_URL : "mongodb://demo_mongo_cache_service:27017"
     depends_on:
@@ -35,8 +33,7 @@ services:
       dockerfile: ./Dockerfile.native
     container_name: demo_graal_optimised
     ports:
-      - 9090:9090
-    restart: on-failure
+      - "9090:9090"
     networks:
       - demo-network
 
